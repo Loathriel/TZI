@@ -21,11 +21,11 @@ namespace EncryptingClasses
             }
             throw error;
         }
-        static public char[] Validate128Bit(string key)
+        static public byte[] Validate128Bit(string key)
         {
-            if (key.Length < 0 || key.Length > 8)
+            if (key.Length != 8)
                 throw NOEKEONError;
-            return key.ToCharArray();
+            return Encoding.Unicode.GetBytes(key);
         }
     }
 }

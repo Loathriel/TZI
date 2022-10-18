@@ -1,191 +1,177 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace EncryptingClasses
 {
     public class NOEKEON : BasicEncrypter
     {
-        private char[] keys, decryptkeys;
-
+        private uint[] keys = new uint[4];
+        
         private static readonly int Nr = 16;
 
-        private static readonly char NULL = (char)0;
+        private static readonly uint[] nullVector =
+        {
+            0x00, 0x00, 0x00, 0x00
+		};
 
-        private static readonly char[] nullVector =
+        private static readonly uint[] roundConstants =
         {
-            NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
-        };
-
-        private static readonly UInt16[] roundConstants1 =
-        {
-            0x8, 0x1, 0x3, 0x6,
-            0xd, 0xa, 0x4, 0x9,
-            0x2, 0x5, 0xb, 0x6,
-            0xc, 0x9, 0x3, 0x6,
-            0xd
-        };
-        private static readonly UInt16[] roundConstants2 =
-        {
-            0x0, 0xb, 0x6, 0xc,
-            0x8, 0xb, 0xd, 0xa,
-            0xf, 0xe, 0xc, 0x3,
-            0x6, 0x7, 0x5, 0xa,
-            0x4
+            0x80, 0x1b, 0x36, 0x6c,
+            0xd8, 0xab, 0x4d, 0x9a,
+            0x2f, 0x5e, 0xbc, 0x63,
+            0xc6, 0x97, 0x35, 0x6a,
+            0xd4
         };
         public override string Decrypt(string data)
         {
-            throw new NotImplementedException();
+            Thetha(keys, nullVector);
+            
+            var result = new StringBuilder();
+            var uints = GetUintsfromBytestr(data);
+            for (int i = 0; i < uints.Length;)
+            {
+                uint[] block = { uints[i++], uints[i++], uints[i++], uints[i++] };
+                for (int j = Nr; j > 0; --j)
+                    Round(block, keys, 0, roundConstants[j]);
+                Thetha(block, keys);
+                block[0] ^= roundConstants[0];
+                result.Append(UintstoStr(block));
+            }
+            return result.ToString();
         }
 
         public override string Encrypt(string data)
         {
             var result = new StringBuilder();
-            var chars = data.ToCharArray();
-            while (chars.Length % 8 != 0)
-                chars = chars.Append(NULL).ToArray();
-            for (int i = 0; i < chars.Length; i += 8)
+            var uints = GetUInts(data);
+            for (int i = 0; i < uints.Length;)
             {
-                int index = i;
-                char[] block =
-                {
-                    chars[index++], chars[index++], 
-                    chars[index++], chars[index++],
-                    chars[index++], chars[index++], 
-                    chars[index++], chars[index++]
-                };
+                uint[] block = { uints[i++], uints[i++], uints[i++], uints[i++] };
                 for (int j = 0; j < Nr; ++j)
-                   Round(block, keys, (char)roundConstants1[j], (char)roundConstants2[j], NULL, NULL);
-                block[0] ^= (char)roundConstants1[Nr];
-                block[1] ^= (char)roundConstants2[Nr];
+                    Round(block, keys, roundConstants[j], 0);
+                block[0] ^= roundConstants[Nr];
                 Thetha(block, keys);
-                for (index = i; index < i + 8; ++index)
-                    result.Append(block[index]);
+                result.Append(UintstoBytestr(block));
             }
             return result.ToString();
         }
 
-        public override void SetKey(string key, int k = 0)
+        public override void SetKey(string key, int k=0)
         {
-            decryptkeys = keys = KeyValidator.Validate128Bit(key);
-            Thetha(decryptkeys, nullVector);
+            byte[] bytes = KeyValidator.Validate128Bit(key);
+            for (int i = 0; i < 4; ++i)
+                keys[i] = BitConverter.ToUInt32(bytes, i * 4);
         }
 
-        private void Round(char[] block, char[] key, char const11, char const12, char const21, char const22)
+        private uint[] GetUintsfromBytestr(string data)
         {
-            block[0] ^= const11;
-            block[1] ^= const12;
+            var split = data.Split();
+            var bytes = new byte[split.Length - 1];
+            for (int i = 0; i < bytes.Length; ++i)
+            {
+                var byt = BitConverter.GetBytes(int.Parse(split[i]));
+                bytes[i] = byt[0];
+            }
+            uint[] result = new uint[bytes.Length / 4];
+            for (int i = 0; i < result.Length; ++i)
+                result[i] = BitConverter.ToUInt32(bytes, i * 4);
+            return result;
+        }
+        private uint[] GetUInts(string data)
+        {
+            var bytes = Encoding.Unicode.GetBytes(data);
+            var zerobyte = BitConverter.GetBytes(false)[0];
+            while (bytes.Length % 16 != 0)
+                bytes = bytes.Append(zerobyte).ToArray();
+            uint[] result = new uint[bytes.Length / 4];
+            for (int i = 0; i < result.Length; ++i)
+                result[i] = BitConverter.ToUInt32(bytes, i * 4);
+            return result;
+        }
+
+        private string UintstoBytestr(uint[] data)
+        {
+            var builder = new StringBuilder();
+            for (int i = 0; i < data.Length; ++i)
+            {
+                var bytes = BitConverter.GetBytes(data[i]);
+                for (int j = 0; j < bytes.Length; ++j)
+                {
+                    builder.Append(bytes[j]);
+                    builder.Append(' ');
+                }
+            }
+            return builder.ToString();
+        }
+
+        private string UintstoStr(uint[] data)
+        {
+            var builder = new StringBuilder();
+            for (int i = 0; i < data.Length; ++i)
+            {
+                var bytes = BitConverter.GetBytes(data[i]);
+                builder.Append(BitConverter.ToChar(bytes, 0));
+                builder.Append(BitConverter.ToChar(bytes, 2));
+            }
+            return builder.ToString();
+        }
+
+        private void Round(uint[] block, uint[] key, uint const1, uint const2) 
+        {
+            block[0] ^= const1;
             Thetha(block, key);
-            block[0] ^= const21;
-            block[1] ^= const22;
+            block[0] ^= const2;
             Pi1(block);
             Gamma(block);
             Pi2(block);
         }
-        private void Thetha(char[] block, char[] key)
+        private void Thetha(uint[] block, uint[] key)
         {
-            char temp = (char)(block[0] ^ block[2]);
-            temp ^= (char)(temp >> 8 ^ temp << 8);
+            uint temp = block[0] ^ block[2];
+            temp ^= temp >> 8 ^ temp << 8;
             block[1] ^= temp;
             block[3] ^= temp;
             for (int i = 0; i < 4; ++i)
                 block[i] ^= key[i];
-            temp = (char)(block[1] ^ block[3]);
-            temp ^= (char)(temp >> 8 ^ temp << 8);
+            temp = block[1] ^ block[3];
+            temp ^= temp >> 8 ^ temp << 8;
             block[0] ^= temp;
             block[2] ^= temp;
         }
-        private void Gamma(char[] block)
+        private void Gamma(uint[] block)
         {
-            block[2] ^= (char)(~block[6] & ~block[4]);
-            block[3] ^= (char)(~block[7] & ~block[5]);
+            block[1] ^= ~block[3] & ~block[2];
+            block[0] ^= block[2] & block[1];
 
-            block[0] ^= (char)(block[4] & block[2]);
-            block[1] ^= (char)(block[5] & block[3]);
+            uint tmp = block[3];
+            block[3] = block[0];
+            block[0] = tmp;
+            block[2] ^= block[0] ^ block[1] ^ block[3];
 
-            (block[0], block[6], block[1], block[7]) = 
-                (block[6], block[0], block[7], block[1]);
-
-            block[4] ^= (char)(block[0] ^ block[2] ^ block[6]);
-            block[5] ^= (char)(block[1] ^ block[3] ^ block[7]);
-
-            block[2] ^= (char)(~block[6] & ~block[4]);
-            block[3] ^= (char)(~block[7] & ~block[5]);
-
-            block[0] ^= (char)(block[4] & block[2]);
-            block[1] ^= (char)(block[5] & block[3]);
+            block[1] ^= ~block[3] & ~block[2];
+            block[0] ^= block[2] & block[1];
         }
-        private void Pi1(char[] block)
+        private void Pi1(uint[] block)
         {
-            uint[] uints =
-            {
-                CharsToUint(block[2], block[3]),
-                CharsToUint(block[4], block[5]),
-                CharsToUint(block[6], block[7])
-            };
-            uints[0] = rotl(uints[0], 1);
-            uints[1] = rotl(uints[1], 5);
-            uints[2] = rotl(uints[2], 2);
-            char[][] res =
-            {
-                UintToChars(uints[0]),
-                UintToChars(uints[1]),
-                UintToChars(uints[2])
-            };
-            (block[2], block[3]) = (res[0][0], res[0][1]);
-            (block[4], block[5]) = (res[1][0], res[1][1]);
-            (block[6], block[7]) = (res[2][0], res[2][1]);
-        }
-        private void Pi2(char[] block)
-        {
-            uint[] uints =
-            {
-                CharsToUint(block[2], block[3]),
-                CharsToUint(block[4], block[5]),
-                CharsToUint(block[6], block[7])
-            };
-            uints[0] = rotl(uints[0], 31);
-            uints[1] = rotl(uints[0], 27);
-            uints[2] = rotl(uints[0], 30);
-            char[][] res =
-            {
-                UintToChars(uints[0]),
-                UintToChars(uints[1]),
-                UintToChars(uints[2])
-            };
-            (block[2], block[3]) = (res[0][0], res[0][1]);
-            (block[4], block[5]) = (res[1][0], res[1][1]);
-            (block[6], block[7]) = (res[2][0], res[2][1]);
+            block[1] = rotl(block[1], 1);
+            block[2] = rotl(block[2], 5);
+            block[3] = rotl(block[3], 2);
         }
 
-        private uint CharsToUint(char c1, char c2)
+        private void Pi2(uint[] block)
         {
-            var bytes = Encoding.Unicode.GetBytes($"{c1}{c2}");
-            swap(bytes);
-            return BitConverter.ToUInt32(bytes, 0);
+            block[1] = rotl(block[1], 31);
+            block[2] = rotl(block[2], 27);
+            block[3] = rotl(block[3], 30);
         }
 
-        private char[] UintToChars(uint u)
-        {
-            var bytes = BitConverter.GetBytes(u);
-            swap(bytes);
-            char[] result = 
-            {
-                BitConverter.ToChar(bytes, 0),
-                BitConverter.ToChar(bytes, 2)
-            };
-            return result;
-        }
-
-        private void swap(byte[] bytes)
-        {
-            (bytes[1], bytes[0]) = (bytes[0], bytes[1]);
-            (bytes[3], bytes[2]) = (bytes[2], bytes[3]);
-        }
         private static uint rotl(uint x, int y)
         {
-            return (x << y) ^ (x >> (32 - y));
+            return (x << y) | (x >> (32 - y));
         }
     }
 }

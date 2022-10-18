@@ -22,7 +22,7 @@ namespace Ceasar
         private void openFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (openFileDialog.ShowDialog() == DialogResult.OK)
-                    inputField.Text = System.IO.File.ReadAllText(openFileDialog.FileName);
+                inputField.Text = System.IO.File.ReadAllText(openFileDialog.FileName);
         }
 
         private void clearToolStripMenuItem_Click(object sender, EventArgs e)
@@ -36,7 +36,7 @@ namespace Ceasar
         {
             if (successfulEncrypterGenerated(keyInput.Text, numericUpDown1.Value))
                 if (saveFileDialog.ShowDialog() == DialogResult.OK)
-                    System.IO.File.WriteAllText(saveFileDialog.FileName, encrypter.Encrypt(inputField.Text.ToLower()));
+                    System.IO.File.WriteAllText(saveFileDialog.FileName, encrypter.Encrypt(inputField.Text), Encoding.Unicode);
         }
 
         private void decodeButton_Click(object sender, EventArgs e)
@@ -44,7 +44,7 @@ namespace Ceasar
 
             if (successfulEncrypterGenerated(keyInput.Text, numericUpDown1.Value))
                 if (saveFileDialog.ShowDialog() == DialogResult.OK)
-                    System.IO.File.WriteAllText(saveFileDialog.FileName, encrypter.Decrypt(inputField.Text.ToLower()));
+                    System.IO.File.WriteAllText(saveFileDialog.FileName, encrypter.Decrypt(inputField.Text), Encoding.Unicode);
         }
 
         private bool successfulEncrypterGenerated(string key, decimal val)
@@ -73,6 +73,11 @@ namespace Ceasar
                 encrypter = new VigenereEncrypter();
                 numericUpDown1.Enabled = false;
             }
+            if (comboBox1.SelectedIndex == 2)
+            {
+                encrypter = new NOEKEON();
+                numericUpDown1.Enabled = false;
             }
         }
+    }
 }
