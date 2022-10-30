@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace EncryptingClasses
+namespace MyClassLib
 {
     public class WrongKeyValue: Exception
     {

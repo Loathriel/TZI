@@ -1,18 +1,20 @@
-﻿using System.Text;
-using System.Collections.Generic;
-using System;
+﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using MyClassLib;
 
 namespace EncryptingClasses
 {
-    public abstract class BasicEncrypter
+    public class CeasarEncrypter : BasicEncrypter
     {
+        private Dictionary<char, char> cipherTable;
+        private Dictionary<char, char> decipherTable;
         protected List<char> alphabet;
         public int alphabetLength;
 
-        protected BasicEncrypter()
+        public CeasarEncrypter() 
         {
-            alphabet = new List<char>() 
+            alphabet = new List<char>()
             {
                 'а', 'б', 'в', 'г', 'ґ', 'д', 'е', 'є', 'ж', 'з', 'и',
                 'і', 'ї', 'й', 'к', 'л', 'м', 'н', 'о', 'п', 'р', 'с',
@@ -20,22 +22,6 @@ namespace EncryptingClasses
             };
             alphabetLength = alphabet.Count;
         }
-
-        protected int Mod(int k, int n)
-        {
-            return ((k %= n) < 0) ? k + n : k;
-        }
-        public abstract string Encrypt(string data);
-        public abstract string Decrypt(string data);
-        public abstract void SetKey(string _haslo, int k);
-    }
-
-    public class CeasarEncrypter : BasicEncrypter
-    {
-        private Dictionary<char, char> cipherTable;
-        private Dictionary<char, char> decipherTable;
-
-        public CeasarEncrypter() : base() { }
 
         public override void SetKey(string haslo, int k)
         {
@@ -46,7 +32,7 @@ namespace EncryptingClasses
             decipherTable = new Dictionary<char, char>();
             int hasloLen = haslo.Length;
             var copy = new List<char>(alphabet);
-            
+
             for (int i = 0; i < hasloLen; ++i)
             {
                 cipherTable.Add(alphabet[k], haslo[i]);
@@ -64,6 +50,7 @@ namespace EncryptingClasses
         }
         private string Transform(string data, Dictionary<char, char> table)
         {
+            data = data.ToLower();
             var builder = new StringBuilder();
             foreach (char c in data)
             {
@@ -83,47 +70,6 @@ namespace EncryptingClasses
 
             return Transform(data, decipherTable);
 
-        }
-    }
-
-    public class VigenereEncrypter : BasicEncrypter
-    {
-        private string haslo;
-
-        public VigenereEncrypter() : base() { }
-
-        private string Transform (string data, Func<int, int, int> func)
-        {
-            var builder = new StringBuilder();
-            int haslo_index = 0;
-            foreach (char c in data.ToLower())
-            {
-                var index = alphabet.IndexOf(c);
-                if (index == -1) { builder.Append(c); }
-                else
-                {
-                    var added = alphabet.IndexOf(haslo[haslo_index]);
-                    var newIndex = Mod(func(index, added), alphabetLength);
-                    builder.Append(alphabet[newIndex]);
-                    if (++haslo_index == haslo.Length)
-                        haslo_index = 0;
-                }
-            }
-            return builder.ToString();
-        }
-        public override string Decrypt(string data)
-        {
-            return Transform(data, (x, y) => x - y);
-        }
-
-        public override string Encrypt(string data)
-        {
-            return Transform(data, (x, y) => x + y);
-        }
-
-        public override void SetKey(string _haslo, int _)
-        {
-            haslo = KeyValidator.ValidateHaslo(_haslo, alphabet);
         }
     }
 }

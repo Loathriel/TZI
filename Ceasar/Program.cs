@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using EncryptingClasses;
 
-namespace Ceasar
+namespace Encode
 {
     static class Program
     {

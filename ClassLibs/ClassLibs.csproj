@@ -42,9 +42,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Custom Exceptions.cs" />
-    <Compile Include="Encrypters.cs" />
+    <Compile Include="Encrypters\BasicEncryptor.cs" />
+    <Compile Include="Encrypters\Ceasar.cs" />
+    <Compile Include="Encrypters\Vigenere.cs" />
     <Compile Include="KeyValidator.cs" />
-    <Compile Include="NOEKEON.cs" />
+    <Compile Include="Encrypters\NOEKEON.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -1,7 +1,7 @@
 ﻿using EncryptingClasses;
 
 
-namespace Ceasar
+namespace Encode
 {
     partial class EncodeDecodeForm
     {
