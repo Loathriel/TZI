@@ -1,10 +1,5 @@
 ﻿using MyClassLib;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ClassLibs.StreamGenerators
 {
@@ -27,14 +22,22 @@ namespace ClassLibs.StreamGenerators
 
         public override void setValues(string key)
         {
-            var keyPair = KeyValidator.ValidatePQ(key);
+            var keys = KeyValidator.ValidatePQR(key);
+            long r = keys[2];
+            n = keys[0] * keys[1];
+            current = (r * r).Mod(n);
+        }
+
+        public static string GenerateKey(string values)
+        {
+            var keyPair = KeyValidator.ValidatePQ(values);
             long p = keyPair.Key, q = keyPair.Value;
-            long r;
+            long r, n;
             r = n = p * q;
             var randomizer = new Random();
             while (!r.IsCoprime(n))
                 r = randomizer.Next(2, (int)n);
-            current = (r * r).Mod(n);
+            return $"{p},{q},{r}";
         }
     }
 }

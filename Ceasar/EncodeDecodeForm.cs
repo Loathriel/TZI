@@ -91,5 +91,22 @@ namespace Encode
                 EnableParts(false, false);
             }
         }
+
+        private void bBSKeyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string key;
+            try
+            {
+                key = BBS.GenerateKey(keyInput.Text);
+            }
+            catch (WrongKeyValue err)
+            {
+                MessageBox.Show(err.Message);
+                return;
+            }
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                System.IO.File.WriteAllText(saveFileDialog.FileName, key, Encoding.Unicode);
+            keyInput.Text = key;
+        }
     }
 }

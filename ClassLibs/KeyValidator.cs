@@ -36,13 +36,34 @@ namespace MyClassLib
             long p, q;
             if (!(long.TryParse(numbers[0], out p) & long.TryParse(numbers[1], out q)))
                 throw new WrongKeyValue("Key values must be integers.");
-            if (!(p % 4 == 3 & q % 4 == 3))
-                throw new WrongKeyValue("Key values must have property val % 4 = 3");
-            if (!(p.IsPrime() & q.IsPrime()))
-                throw new WrongKeyValue("Key values must be prime");
-            if (p == q)
-                throw new WrongKeyValue("Key values must be different numbers");
+            checkPQ(p, q);
             return new KeyValuePair<long, long>(p, q);
+        }
+        static public long[] ValidatePQR(string key)
+        {
+            var values = key.Split(new char[] { ' ', ';', ',', '.' });
+            var numbers = values.Where(x => x.Length > 0).ToArray();
+            if (numbers.Length != 3)
+                throw new WrongKeyValue("Key must contain three separated positive integers: p, q, r.");
+            long p, q, r;
+            if (!(long.TryParse(numbers[0], out p) & 
+                long.TryParse(numbers[1], out q) &
+                long.TryParse(numbers[2], out r)))
+                throw new WrongKeyValue("Key values must be integers.");
+            checkPQ(p, q);
+            if (!r.IsCoprime(p * q))
+                throw new WrongKeyValue("R must be coprime with p*q");
+            return new long[] { p, q, r };
+        }
+
+        static private void checkPQ(long p, long q)
+        {
+            if (!(p % 4 == 3 & q % 4 == 3))
+                throw new WrongKeyValue("P and Q must have property val % 4 = 3");
+            if (!(p.IsPrime() & q.IsPrime()))
+                throw new WrongKeyValue("P and Q values must be prime");
+            if (p == q)
+                throw new WrongKeyValue("P and Q must be different numbers");
         }
     }
 }

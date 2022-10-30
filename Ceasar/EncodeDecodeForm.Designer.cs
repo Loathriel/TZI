@@ -45,6 +45,8 @@ namespace Encode
             this.keyInput = new System.Windows.Forms.TextBox();
             this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.bBSKeyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.SuspendLayout();
@@ -64,7 +66,8 @@ namespace Encode
             // 
             this.menuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fileToolStripMenuItem});
+            this.fileToolStripMenuItem,
+            this.toolStripMenuItem1});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Padding = new System.Windows.Forms.Padding(4, 2, 0, 2);
@@ -177,6 +180,21 @@ namespace Encode
             this.comboBox1.TabIndex = 11;
             this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
             // 
+            // toolStripMenuItem1
+            // 
+            this.toolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.bBSKeyToolStripMenuItem});
+            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(93, 20);
+            this.toolStripMenuItem1.Text = "Generate Keys";
+            // 
+            // bBSKeyToolStripMenuItem
+            // 
+            this.bBSKeyToolStripMenuItem.Name = "bBSKeyToolStripMenuItem";
+            this.bBSKeyToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.bBSKeyToolStripMenuItem.Text = "BBS Key";
+            this.bBSKeyToolStripMenuItem.Click += new System.EventHandler(this.bBSKeyToolStripMenuItem_Click);
+            // 
             // EncodeDecodeForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -216,6 +234,8 @@ namespace Encode
         private System.Windows.Forms.TextBox keyInput;
         private System.Windows.Forms.NumericUpDown numericUpDown1;
         private System.Windows.Forms.ComboBox comboBox1;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem bBSKeyToolStripMenuItem;
     }
 }
 
