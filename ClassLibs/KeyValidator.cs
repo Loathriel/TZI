@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace MyClassLib
@@ -25,6 +26,23 @@ namespace MyClassLib
             if (key.Length != 8)
                 throw NOEKEONError;
             return Encoding.Unicode.GetBytes(key);
+        }
+        static public KeyValuePair<long, long> ValidatePQ(string key)
+        {
+            var values = key.Split(new char[] { ' ', ';', ',', '.'});
+            var numbers = values.Where(x => x.Length > 0).ToArray();
+            if (numbers.Length != 2)
+                throw new WrongKeyValue("Key must contain two separated positive integers.");
+            long p, q;
+            if (!(long.TryParse(numbers[0], out p) & long.TryParse(numbers[1], out q)))
+                throw new WrongKeyValue("Key values must be integers.");
+            if (!(p % 4 == 3 & q % 4 == 3))
+                throw new WrongKeyValue("Key values must have property val % 4 = 3");
+            if (!(p.IsPrime() & q.IsPrime()))
+                throw new WrongKeyValue("Key values must be prime");
+            if (p == q)
+                throw new WrongKeyValue("Key values must be different numbers");
+            return new KeyValuePair<long, long>(p, q);
         }
     }
 }

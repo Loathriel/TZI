@@ -34,7 +34,7 @@ namespace EncryptingClasses
                 else
                 {
                     var added = alphabet.IndexOf(haslo[haslo_index]);
-                    var newIndex = Mod(func(index, added), alphabetLength);
+                    var newIndex = (int)Mod(func(index, added), alphabetLength);
                     builder.Append(alphabet[newIndex]);
                     if (++haslo_index == haslo.Length)
                         haslo_index = 0;

@@ -37,7 +37,7 @@ namespace EncryptingClasses
             {
                 cipherTable.Add(alphabet[k], haslo[i]);
                 decipherTable.Add(haslo[i], alphabet[k]);
-                k = Mod(k + 1, alphabetLength);
+                k = (int)Mod(k + 1, alphabetLength);
                 copy.Remove(haslo[i]);
             }
 
@@ -45,7 +45,7 @@ namespace EncryptingClasses
             {
                 cipherTable.Add(alphabet[k], copy[i]);
                 decipherTable.Add(copy[i], alphabet[k]);
-                k = Mod(k + 1, alphabetLength);
+                k = (int)Mod(k + 1, alphabetLength);
             }
         }
         private string Transform(string data, Dictionary<char, char> table)

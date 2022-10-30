@@ -3,6 +3,7 @@ using MyClassLib;
 using System.Text;
 using System.Windows.Forms;
 using EncryptingClasses;
+using ClassLibs.StreamGenerators;
 
 namespace Encode
 {
@@ -56,22 +57,38 @@ namespace Encode
             }
         }
 
+        private void EnableParts(bool inp, bool num)
+        {
+            keyInput.Enabled = inp;
+            numericUpDown1.Enabled = num;
+        }
+
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (comboBox1.SelectedIndex == 0)
             {
                 encrypter = new CeasarEncrypter();
-                numericUpDown1.Enabled = true;
+                EnableParts(true, true);
             }
             if (comboBox1.SelectedIndex == 1)
             {
                 encrypter = new VigenereEncrypter();
-                numericUpDown1.Enabled = false;
+                EnableParts(true, false);
             }
             if (comboBox1.SelectedIndex == 2)
             {
                 encrypter = new NOEKEON();
-                numericUpDown1.Enabled = false;
+                EnableParts(true, false);
+            }
+            if (comboBox1.SelectedIndex == 3)
+            {
+                encrypter = new StreamBasedEncrypter(new BBS());
+                EnableParts(true, false);
+            }
+            if (comboBox1.SelectedIndex == 4)
+            {
+                encrypter = new StreamBasedEncrypter(new LFSR());
+                EnableParts(false, false);
             }
         }
     }

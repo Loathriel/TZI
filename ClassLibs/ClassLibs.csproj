@@ -43,11 +43,16 @@
   <ItemGroup>
     <Compile Include="Custom Exceptions.cs" />
     <Compile Include="Encrypters\BasicEncryptor.cs" />
+    <Compile Include="Encrypters\StreamEncryptor.cs" />
     <Compile Include="Encrypters\Ceasar.cs" />
     <Compile Include="Encrypters\Vigenere.cs" />
     <Compile Include="KeyValidator.cs" />
     <Compile Include="Encrypters\NOEKEON.cs" />
+    <Compile Include="MyMath.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StreamGenerators\BasicSGenerator.cs" />
+    <Compile Include="StreamGenerators\BBS.cs" />
+    <Compile Include="StreamGenerators\LFSR.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

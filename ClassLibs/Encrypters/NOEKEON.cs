@@ -58,7 +58,7 @@ namespace EncryptingClasses
             return result.ToString();
         }
 
-        public override void SetKey(string key, int k=0)
+        public override void SetKey(string key, int _)
         {
             byte[] bytes = KeyValidator.Validate128Bit(key);
             for (int i = 0; i < 4; ++i)

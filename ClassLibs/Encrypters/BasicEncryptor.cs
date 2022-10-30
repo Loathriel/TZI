@@ -2,7 +2,7 @@
 {
     public abstract class BasicEncrypter
     {
-        protected int Mod(int k, int n)
+        protected long Mod(long k, long n)
         {
             return ((k %= n) < 0) ? k + n : k;
         }
