@@ -22,7 +22,7 @@ namespace ClassLibs.StreamGenerators
             int result = 0;
             for (int i = 0; i < 16; ++i)
             {
-                bool newBit = bits[10] ^ bits[1];
+                bool newBit = bits[10] ^ bits[1] ^ true;
                 int toAdd = bits[0] ? 1 : 0;
                 result += toAdd << i;
                 RShift(newBit);
